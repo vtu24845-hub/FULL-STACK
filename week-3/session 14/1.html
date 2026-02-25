@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ScoreBox — lightweight match score (let & const)</title>
+  <style>
+    :root{--bg:#f3f7ff;--card:#fff;--accent:#ff6b6b;--muted:#274059}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+    .wrap{width:min(880px,96%);display:grid;grid-template-columns:1fr 260px;gap:1rem}
+    @media(max-width:900px){.wrap{grid-template-columns:1fr}}
+    .card{background:var(--card);border-radius:12px;padding:1.2rem;border:1px solid rgba(20,40,60,0.06);box-shadow:0 8px 30px rgba(20,40,60,0.06)}
+    .title{font-weight:800;color:var(--muted);font-size:1.2rem}
+    .sub{color:#6c8596;font-size:0.95rem;margin-bottom:0.8rem}
+
+    .score-area{display:flex;gap:0.8rem;align-items:center;justify-content:space-between}
+    .team{flex:1;background:#f9fbff;border-radius:10px;padding:0.8rem;text-align:center}
+    .team h3{font-size:0.9rem;color:#35516a;margin-bottom:0.4rem}
+    .points{font-size:3.2rem;font-weight:900;color:var(--accent)}
+    .vs{width:64px;text-align:center;font-weight:900;color:#9fb0c3}
+
+    .controls{display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin-top:0.8rem}
+    button{cursor:pointer;border:0;padding:0.5rem 0.7rem;border-radius:10px;background:#f0f6ff;color:#0d2b3a;font-weight:700}
+    button.ghost{background:transparent;border:1px solid rgba(20,40,60,0.06)}
+    .small{padding:0.4rem 0.6rem;font-size:0.9rem}
+
+    .state{font-family:monospace;background:#eef6ff;padding:0.6rem;border-radius:8px;margin-top:0.8rem;color:#2b4b62}
+
+    /* slider style */
+    .slider{width:100%}
+    input[type=range]{-webkit-appearance:none;height:6px;background:linear-gradient(90deg,#ffdede,#ffd8a8);border-radius:6px}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,0.12)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <div class="title">Match Score</div>
+      <div class="sub">Demonstrates ES6 state: <code>let</code> for mutable scores, <code>const</code> for DOM refs</div>
+
+      <div class="score-area">
+        <div class="team">
+          <h3>HOME</h3>
+          <div class="points" id="homePoints">0</div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="team">
+          <h3>AWAY</h3>
+          <div class="points" id="awayPoints">0</div>
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:1rem">
+        <button id="h+1">H +1</button>
+        <button id="h-1">H -1</button>
+        <button id="a+1">A +1</button>
+        <button id="a-1">A -1</button>
+        <button id="swap" class="ghost small">Swap</button>
+        <button id="reset" class="ghost small">Reset</button>
+      </div>
+
+      <div class="state" id="stateText">home = 0 · away = 0</div>
+    </section>
+
+    <aside class="card">
+      <div class="title">Quick Controls</div>
+      <div class="sub">Drag sliders to update scores (also demonstrates live binding)</div>
+      <label style="display:block;margin-top:0.8rem;font-weight:700;color:#274059">Home</label>
+      <input class="slider" id="homeRange" type="range" min="0" max="20" value="0">
+      <label style="display:block;margin-top:0.6rem;font-weight:700;color:#274059">Away</label>
+      <input class="slider" id="awayRange" type="range" min="0" max="20" value="0">
+      <div style="margin-top:0.9rem;color:#6c8596;font-size:0.95rem">Scores are stored in <code>let</code> variables and rendered via a single update function.</div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      // mutable state
+      let home = 0;
+      let away = 0;
+
+      // const bindings
+      const homeEl = document.getElementById('homePoints');
+      const awayEl = document.getElementById('awayPoints');
+      const stateEl = document.getElementById('stateText');
+      const homeRange = document.getElementById('homeRange');
+      const awayRange = document.getElementById('awayRange');
+
+      const update = () => {
+        homeEl.textContent = home;
+        awayEl.textContent = away;
+        stateEl.textContent = `home = ${home} · away = ${away}`;
+        homeRange.value = home;
+        awayRange.value = away;
+      };
+
+      document.getElementById('h+1').addEventListener('click', () => { home += 1; update(); });
+      document.getElementById('h-1').addEventListener('click', () => { home = Math.max(0, home-1); update(); });
+      document.getElementById('a+1').addEventListener('click', () => { away += 1; update(); });
+      document.getElementById('a-1').addEventListener('click', () => { away = Math.max(0, away-1); update(); });
+      document.getElementById('swap').addEventListener('click', () => { const t = home; home = away; away = t; update(); });
+      document.getElementById('reset').addEventListener('click', () => { home = 0; away = 0; update(); });
+
+      homeRange.addEventListener('input', (e) => { home = Number(e.target.value); update(); });
+      awayRange.addEventListener('input', (e) => { away = Number(e.target.value); update(); });
+
+      // initialize
+      update();
+    })();
+  </script>
+</body>
+</html>
+</html>

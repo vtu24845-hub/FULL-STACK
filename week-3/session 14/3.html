@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Destructure — object & array examples</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#f0f6ff,#eaf3ff);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;color:#063246}
+    .grid{width:min(980px,96%);display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:880px){.grid{grid-template-columns:1fr}}
+    .card{background:#fff;border-radius:12px;padding:1rem;border:1px solid rgba(3,15,25,0.06);box-shadow:0 8px 24px rgba(3,15,25,0.06)}
+    h1{font-size:1.25rem;margin-bottom:0.2rem}
+    p.sub{color:#3f6b7e;margin-bottom:0.8rem}
+
+    pre{background:#001e2b;color:#bfe8ff;padding:0.8rem;border-radius:8px;font-family:monospace;overflow:auto}
+    .box{padding:0.8rem;background:#f7feff;border-radius:8px;border:1px solid rgba(3,15,25,0.03)}
+    .label{font-weight:800;color:#064a5a;margin-bottom:0.5rem}
+    .result{font-family:monospace;background:#eaf8ff;padding:0.6rem;border-radius:6px}
+    button{background:#0077b6;color:white;padding:0.5rem 0.8rem;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <section class="card">
+      <h1>Object & Array Destructuring</h1>
+      <p class="sub">Interactive examples — extract values without dot or index notation</p>
+
+      <div class="box">
+        <div class="label">Source object</div>
+        <pre id="srcObj">{ name: 'Alex', city: 'Austin', job: 'dev', skills: ['react','node'] }</pre>
+        <div style="height:8px"></div>
+        <div class="label">Source array</div>
+        <pre id="srcArr">['#f94144','#577590','#43aa8b','#f9c74f']</pre>
+        <div style="display:flex;gap:0.5rem;margin-top:0.7rem">
+          <button id="run">Run destructure</button>
+          <button id="swap" style="background:#2a9d8f">Swap names</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h1>Results</h1>
+      <p class="sub">Values extracted by destructuring</p>
+      <div style="margin-bottom:0.6rem">
+        <div class="label">Object</div>
+        <div class="result" id="objRes">name: —\ncity: —\njob: —</div>
+      </div>
+      <div>
+        <div class="label">Array</div>
+        <div class="result" id="arrRes">primary: —\nsecondary: —\naccent: —</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      // data
+      const person = { name: 'Alex', city: 'Austin', job: 'dev', skills:['react','node'] };
+      const colors = ['#f94144','#577590','#43aa8b','#f9c74f'];
+
+      const objRes = document.getElementById('objRes');
+      const arrRes = document.getElementById('arrRes');
+      const run = document.getElementById('run');
+      const swapBtn = document.getElementById('swap');
+
+      function doDestruct(){
+        // object destructuring
+        const { name, city, job } = person;
+        // array destructuring (skip second)
+        const [ primary, , secondary, accent ] = colors;
+
+        objRes.textContent = `name: ${name}\ncity: ${city}\njob: ${job}`;
+        arrRes.textContent = `primary: ${primary}\nsecondary: ${secondary}\naccent: ${accent}`;
+      }
+
+      // swap example modifies the source references (but keeps destructuring demonstration)
+      swapBtn.addEventListener('click', ()=>{
+        // swap name and job values to show destructuring picks new values
+        const temp = person.name; person.name = person.job; person.job = temp;
+        doDestruct();
+        swapBtn.textContent = 'Swapped!';
+        setTimeout(()=>{ swapBtn.textContent='Swap names' },700);
+      });
+
+      run.addEventListener('click', doDestruct);
+
+      // initial
+      doDestruct();
+    })();
+  </script>
+</body>
+</html>

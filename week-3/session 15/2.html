@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass — mousemove quadrant detection</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #f5f7fa 0%, #e8ecf1 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+    }
+
+    .main {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .sub {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .viewport {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: background 0.2s;
+    }
+
+    .quadrant {
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      font-weight: bold;
+      color: rgba(255,255,255,0.15);
+      text-transform: uppercase;
+    }
+
+    .viewport.q1 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .viewport.q2 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .viewport.q3 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .viewport.q4 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+
+    .q-top-right { top: 0; left: 50%; width: 50%; height: 50%; }
+    .q-top-left { top: 0; left: 0; width: 50%; height: 50%; }
+    .q-bottom-left { top: 50%; left: 0; width: 50%; height: 50%; }
+    .q-bottom-right { top: 50%; left: 50%; width: 50%; height: 50%; }
+
+    .crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .crosshair-dot {
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .crosshair-line {
+      position: absolute;
+      background: rgba(255,255,255,0.5);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .crosshair-h {
+      width: 60px;
+      height: 2px;
+    }
+
+    .crosshair-v {
+      width: 2px;
+      height: 60px;
+    }
+
+    .sidebar {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+
+    .stat {
+      margin-bottom: 20px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      font-family: 'Courier New', monospace;
+    }
+
+    .divider {
+      height: 1px;
+      background: #eee;
+      margin: 16px 0;
+    }
+
+    .legend {
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .q1-dot { background: #f5576c; }
+    .q2-dot { background: #00f2fe; }
+    .q3-dot { background: #43e97b; }
+    .q4-dot { background: #fee140; }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      .stat {
+        margin-bottom: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+      <h1>Compass</h1>
+      <p class="sub">Move your mouse across the viewport to detect quadrants</p>
+
+      <div class="viewport" id="viewport">
+        <div class="quadrant q-top-right"></div>
+        <div class="quadrant q-top-left"></div>
+        <div class="quadrant q-bottom-left"></div>
+        <div class="quadrant q-bottom-right"></div>
+
+        <div class="crosshair">
+          <div class="crosshair-line crosshair-h"></div>
+          <div class="crosshair-line crosshair-v"></div>
+          <div class="crosshair-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="stat">
+        <div class="stat-label">X Coordinate</div>
+        <div class="stat-value" id="coordX">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Y Coordinate</div>
+        <div class="stat-value" id="coordY">0</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="stat">
+        <div class="stat-label">Current Quadrant</div>
+        <div class="stat-value" id="quadrant">—</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot q1-dot"></div>
+          <span>Q1: Top-Right</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot q2-dot"></div>
+          <span>Q2: Top-Left</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot q3-dot"></div>
+          <span>Q3: Bottom-Left</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot q4-dot"></div>
+          <span>Q4: Bottom-Right</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      const viewport = document.getElementById('viewport');
+      const coordX = document.getElementById('coordX');
+      const coordY = document.getElementById('coordY');
+      const quadrant = document.getElementById('quadrant');
+
+      const quads = ['q1', 'q2', 'q3', 'q4'];
+      const quadNames = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+      document.addEventListener('mousemove', (e) => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const x = e.clientX;
+        const y = e.clientY;
+
+        // determine quadrant
+        let q = 3; // default Q3
+        if (x > vw / 2 && y < vh / 2) q = 0; // Q1
+        else if (x < vw / 2 && y < vh / 2) q = 1; // Q2
+        else if (x < vw / 2 && y > vh / 2) q = 2; // Q3
+        else if (x > vw / 2 && y > vh / 2) q = 3; // Q4
+
+        // update viewport class
+        viewport.className = 'viewport ' + quads[q];
+
+        // update display
+        coordX.textContent = x;
+        coordY.textContent = y;
+        quadrant.textContent = quadNames[q];
+      });
+    })();
+  </script>
+</body>
+</html>

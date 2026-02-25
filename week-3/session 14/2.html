@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ReceiptLab — arrow function demo</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial;background:#0f1724;color:#e6eef6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+    .shell{width:min(820px,96%);display:grid;grid-template-columns:1fr 320px;gap:1rem}
+    @media(max-width:980px){.shell{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg,#0b1220 0%,#08101a 100%);padding:1.2rem;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    h1{font-size:1.4rem;margin-bottom:0.25rem}
+    p.sub{color:#9fb0c8;margin-bottom:0.8rem}
+
+    .panel{background:#071023;padding:0.9rem;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
+    label{display:block;color:#9fb0c8;font-weight:700;margin-bottom:0.4rem}
+    input{width:100%;padding:0.6rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#0b1624;color:#eaf4ff}
+    .row{margin-bottom:0.8rem}
+    .btn{background:#2dd4bf;color:#022c2a;border:0;padding:0.6rem 0.9rem;border-radius:8px;font-weight:800;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#9fb0c8}
+
+    .output{background:#06121c;border-radius:8px;padding:1rem;border:1px solid rgba(255,255,255,0.02);font-family:monospace}
+    .hint{color:#7f9ab0;font-size:0.9rem;margin-top:0.6rem}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <main class="card">
+      <h1>generateReceipt</h1>
+      <p class="sub">arrow function + template literals • live preview</p>
+
+      <div class="panel">
+        <div class="row">
+          <label for="price">Price ($)</label>
+          <input id="price" type="number" value="45.5" step="0.01" min="0">
+        </div>
+        <div class="row">
+          <label for="tip">Tip ($)</label>
+          <input id="tip" type="number" value="8.5" step="0.01" min="0">
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.6rem">
+          <button id="calc" class="btn">Calculate</button>
+          <button id="sample" class="btn ghost">Sample</button>
+        </div>
+        <div class="hint">Arrow function used for calculation; output formatted to 2 decimals.</div>
+      </div>
+    </main>
+
+    <aside class="card">
+      <h1>Result</h1>
+      <p class="sub">Live message from <code>generateReceipt</code></p>
+      <div class="output" id="out">Receipt: $45.50 + $8.50 tip = $54.00</div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      // arrow function: simple and concise
+      const generateReceipt = (price, tip) => {
+        const p = Number(price) || 0;
+        const t = Number(tip) || 0;
+        const total = p + t;
+        return `Receipt: $${p.toFixed(2)} + $${t.toFixed(2)} tip = $${total.toFixed(2)}`;
+      };
+
+      const price = document.getElementById('price');
+      const tip = document.getElementById('tip');
+      const out = document.getElementById('out');
+      const calc = document.getElementById('calc');
+      const sample = document.getElementById('sample');
+
+      const update = () => { out.textContent = generateReceipt(price.value, tip.value); };
+      calc.addEventListener('click', update);
+      sample.addEventListener('click', ()=>{ price.value='15.99'; tip.value='3.50'; update(); });
+
+      // initial
+      update();
+    })();
+  </script>
+</body>
+</html>

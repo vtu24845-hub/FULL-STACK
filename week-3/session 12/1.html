@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Accessible Auth — compact sign in / sign up</title>
+  <style>
+    /* New visual: vibrant rounded cards with left illustration */
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa7b4;--accent:#ffcc66}
+    html,body{height:100%}
+    body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:linear-gradient(120deg,#071426 0%,#0f1724 60%);color:#e6eef6;display:flex;align-items:center;justify-content:center;padding:2rem}
+
+    .wrap{max-width:1100px;width:100%;display:grid;grid-template-columns:420px 1fr;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(2,6,23,0.6);background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+
+    /* left artwork panel */
+    .side{padding:2rem;background:linear-gradient(180deg,#071b2d,#093447);display:flex;flex-direction:column;gap:1rem;align-items:flex-start}
+    .brand{display:flex;align-items:center;gap:0.8rem}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(90deg,var(--accent),#ff9f43);display:flex;align-items:center;justify-content:center;font-weight:800;color:#071426}
+    .side h2{font-size:1.45rem;color:#eaf6ff}
+    .side p{color:var(--muted);font-size:0.95rem}
+    .side .promo{margin-top:auto;color:#cfeefd;font-size:0.9rem}
+
+    /* right content area */
+    .content{padding:2rem;display:flex;flex-direction:column;gap:1rem}
+    .tabs{display:flex;gap:0.5rem;border-radius:999px;background:rgba(255,255,255,0.02);padding:4px;width:max-content}
+    .tab{padding:0.45rem 1rem;border-radius:999px;color:var(--muted);cursor:pointer;font-weight:700}
+    .tab[aria-selected="true"]{background:linear-gradient(90deg,var(--accent),#ff9f43);color:#071426}
+
+    .card{margin-top:0.6rem;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:1.25rem;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    form{display:flex;flex-direction:column;gap:0.9rem}
+    label{font-size:0.9rem;color:#cfeefd;font-weight:700}
+    input{padding:0.9rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.01);color:#eaf6ff}
+    input:focus{outline:2px solid rgba(255,204,102,0.18)}
+    .hint{font-size:0.8rem;color:var(--muted)}
+
+    .actions{display:flex;gap:0.6rem;align-items:center;margin-top:0.6rem}
+    .btn{padding:0.7rem 1.1rem;border-radius:999px;border:none;cursor:pointer;font-weight:800}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#ff9f43);color:#071426}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+    .notice{font-size:0.85rem;color:#cfeefd;padding-top:0.6rem}
+
+    @media (max-width:900px){.wrap{grid-template-columns:1fr}.side{display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="side" aria-hidden="false">
+      <div class="brand"><div class="logo">A</div><div><strong style="color:#eaf6ff">AuthLab</strong><div style="font-size:0.85rem;color:var(--muted)">secure & accessible</div></div></div>
+      <h2>Sign in or create an account</h2>
+      <p>Keyboard-first, ARIA-friendly forms with clear labels and polite live regions for announcements.</p>
+      <div class="promo">Tip: use <kbd>Tab</kbd> to navigate fields — screen reader announcements available.</div>
+    </aside>
+
+    <main class="content">
+      <div role="tablist" class="tabs" aria-label="auth tabs">
+        <button class="tab" role="tab" aria-selected="true" id="tab-signin">Sign in</button>
+        <button class="tab" role="tab" aria-selected="false" id="tab-signup">Sign up</button>
+      </div>
+
+      <section class="card" id="panel-signin" role="tabpanel" aria-labelledby="tab-signin">
+        <form id="signin" aria-label="Sign in form" novalidate>
+          <label for="si-email">Email</label>
+          <input id="si-email" type="email" placeholder="you@company.com" aria-required="true" required />
+          <label for="si-pass">Password</label>
+          <input id="si-pass" type="password" placeholder="••••••••" minlength="8" aria-required="true" required />
+          <div class="actions">
+            <button class="btn primary" type="submit">Sign in</button>
+            <button class="btn ghost" type="button" id="forgot">Forgot?</button>
+          </div>
+          <div class="notice">Signing in uses a demo live region to confirm action (no network request).</div>
+        </form>
+        <div class="sr-only" id="si-live" aria-live="polite">Sign in panel loaded</div>
+      </section>
+
+      <section class="card" id="panel-signup" role="tabpanel" aria-labelledby="tab-signup" hidden>
+        <form id="signup" aria-label="Sign up form" novalidate>
+          <label for="su-name">Full name</label>
+          <input id="su-name" type="text" placeholder="Jane Doe" aria-required="true" required />
+          <label for="su-email">Email</label>
+          <input id="su-email" type="email" placeholder="hello@domain.com" aria-required="true" required />
+          <label for="su-pass">Create password</label>
+          <input id="su-pass" type="password" placeholder="At least 8 characters" minlength="8" aria-required="true" required />
+          <div class="actions">
+            <button class="btn primary" type="submit">Create account</button>
+            <button class="btn ghost" type="button" id="cancel">Cancel</button>
+          </div>
+        </form>
+        <div class="sr-only" id="su-live" aria-live="polite">Sign up panel loaded</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // minimal interaction: tab switching and live announcements (keeps topic accessible)
+    (function(){
+      const tabSignIn = document.getElementById('tab-signin');
+      const tabSignUp = document.getElementById('tab-signup');
+      const panelSignIn = document.getElementById('panel-signin');
+      const panelSignUp = document.getElementById('panel-signup');
+      const siLive = document.getElementById('si-live');
+      const suLive = document.getElementById('su-live');
+
+      function activate(signin){
+        if(signin){
+          tabSignIn.setAttribute('aria-selected','true');tabSignUp.setAttribute('aria-selected','false');
+          panelSignIn.hidden = false; panelSignUp.hidden = true; siLive.textContent='Sign in panel active';
+        } else {
+          tabSignIn.setAttribute('aria-selected','false');tabSignUp.setAttribute('aria-selected','true');
+          panelSignIn.hidden = true; panelSignUp.hidden = false; suLive.textContent='Sign up panel active';
+        }
+      }
+
+      tabSignIn.addEventListener('click', ()=>activate(true));
+      tabSignUp.addEventListener('click', ()=>activate(false));
+
+      // prevent real submits — announce via live region
+      document.getElementById('signin').addEventListener('submit', function(e){
+        e.preventDefault(); siLive.textContent = 'Signing in (demo)'; setTimeout(()=>siLive.textContent='ready',1500);
+      });
+      document.getElementById('signup').addEventListener('submit', function(e){
+        e.preventDefault(); suLive.textContent = 'Account created (demo)'; setTimeout(()=>suLive.textContent='ready',1500);
+      });
+    })();
+  </script>
+</body>
+</html>
+
+          <!-- terms checkbox (with aria) -->
+          <div style="display: flex; align-items: center; gap: 0.8rem; margin: 0.2rem 0;">
+            <input type="checkbox" id="terms" name="terms" aria-label="accept terms and privacy policy" required style="width: 1.2rem; height:1.2rem;">
+            <label for="terms" style="font-weight: 400;">i accept the <a href="#" aria-label="terms and conditions (opens in same window)">terms</a> and <a href="#" aria-label="privacy policy">privacy</a></label>
+          </div>
+
+          <!-- sign up button -->
+          <button type="submit" class="btn-submit" aria-label="create new account">
+            create account →
+          </button>
+
+          <!-- extra note with aria-live region (polite) -->
+          <div class="divider">
+            <span class="divider-line"></span>
+            <span>existing user? <a href="#" aria-label="go to sign in instead">sign in</a></span>
+            <span class="divider-line"></span>
+          </div>
+        </form>
+        <!-- live region for signup feedback -->
+        <div class="sr-only" aria-live="polite" aria-atomic="true" id="signup-live">sign up form ready</div>
+      </section>
+    </div>
+
+    <!-- FOOTER / aria checklist summary (visual demonstration of labels) -->
+    <footer class="aria-notes" role="contentinfo" aria-label="accessibility features summary">
+      <span>✅ all inputs have <strong>aria-label</strong> / labelledby</span>
+      <span>🔤 <strong>aria-required</strong> on mandatory fields</span>
+      <span>📢 <strong>aria-describedby</strong> hints</span>
+      <span class="badge">wcga 2.1 AA</span>
+    </footer>
+
+    <!-- hidden live region for global announcements (if any) -->
+    <div class="sr-only" aria-live="assertive" aria-atomic="true" id="global-announce"></div>
+  </div>
+
+  <!-- tiny script to demonstrate interactive aria (just for demo / no real validation) 
+       but we keep everything clean, only to show how error / alert can be wired. 
+       we add a click handler on both forms to prevent actual submit and show a polite message -->
+  <script>
+    (function() {
+      // prevent actual page reload and show fake ARIA live feedback
+      const signinForm = document.getElementById('signin-form');
+      const signupForm = document.getElementById('signup-form');
+      const signinLive = document.getElementById('signin-live');
+      const signupLive = document.getElementById('signup-live');
+      const globalAnnounce = document.getElementById('global-announce');
+
+      // helper to set live region text
+      function announce(element, message) {
+        element.textContent = message;
+        // after a short delay, clear to avoid repeated reading? fine.
+        setTimeout(() => { element.textContent = 'ready'; }, 2000);
+      }
+
+      signinForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // simulate demo check: if fields are filled? just show message.
+        const email = document.getElementById('signin-email').value.trim();
+        const pw = document.getElementById('signin-password').value;
+        if (!email || !pw) {
+          announce(globalAnnounce, 'sign in error: email and password required');
+          // optionally show an error element (demo)
+          const errDiv = document.getElementById('signin-pw-error');
+          errDiv.style.display = 'inline-block';
+          errDiv.textContent = '⛔ both fields required';
+          setTimeout(() => { errDiv.style.display = 'none'; }, 3000);
+        } else {
+          announce(globalAnnounce, `signing in as ${email} (demo)`);
+          // hide any previous error
+          document.getElementById('signin-pw-error').style.display = 'none';
+        }
+        // set aria-invalid demo randomly? not needed.
+      });
+
+      signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const firstName = document.getElementById('first-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const pw = document.getElementById('signup-password').value;
+        const confirm = document.getElementById('confirm-password').value;
+        const terms = document.getElementById('terms').checked;
+
+        if (!firstName || !email || !pw || !confirm || !terms) {
+          announce(globalAnnounce, 'sign up error: please fill all required fields');
+          // optionally we could inject a dynamic alert, but just use global.
+        } else if (pw !== confirm) {
+          announce(globalAnnounce, 'error: passwords do not match');
+        } else {
+          announce(globalAnnounce, `welcome ${firstName}! account created (demo)`);
+        }
+      });
+
+      // For demonstration, attach some aria attributes to show pattern.
+      // On password mismatch we could set aria-invalid, but it's a static demo.
+      // We'll show a small hint in confirm password input via aria-describedby dynamic update? not necessary.
+      // set initial aria-invalid false for all required fields (they are not invalid)
+      document.querySelectorAll('input[required]').forEach(inp => {
+        inp.setAttribute('aria-invalid', 'false');
+      });
+
+      // Extra: when confirm password field loses value, we could set aria-invalid (just as demo)
+      const confirmPw = document.getElementById('confirm-password');
+      const pwField = document.getElementById('signup-password');
+      if (confirmPw && pwField) {
+        confirmPw.addEventListener('input', () => {
+          if (confirmPw.value && confirmPw.value !== pwField.value) {
+            confirmPw.setAttribute('aria-invalid', 'true');
+          } else {
+            confirmPw.setAttribute('aria-invalid', 'false');
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

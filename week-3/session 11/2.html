@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>blogosphere · media‑driven platform</title>
+  <style>
+    /* Warm, airy redesign for media blog — same structure retained */
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fffdf9;--card:#ffffff;--muted:#6b7b8a;--accent:#ff7a59;--soft:#f6f3f1}
+    body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial;background:var(--bg);color:#102131;line-height:1.5;padding:2rem 1.5rem;min-height:100vh;display:flex;flex-direction:column}
+    .platform-grid{display:grid;grid-template-columns:320px 1fr;gap:2rem;max-width:1500px;margin:0 auto;width:100%;flex:1}
+
+    /* Sidebar: rounded, soft shadow, accent highlights */
+    .media-sidebar{background:var(--card);border-radius:20px;padding:1.8rem 1.4rem;box-shadow:0 14px 30px rgba(18,35,50,0.06);border:1px solid rgba(16,33,49,0.04);align-self:start;position:sticky;top:2rem}
+    .sidebar-header h2{font-size:1.6rem;font-weight:700;background:linear-gradient(90deg,#ff7a59,#ffb27a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .sidebar-header p{color:var(--muted);margin-top:0.25rem}
+
+    .audio-player-section{background:var(--soft);border-radius:16px;padding:1.2rem;border:1px solid rgba(16,33,49,0.03);margin-bottom:1.6rem}
+    .audio-player-section h3{font-size:1rem;color:#133b4d;margin-bottom:0.6rem}
+    .audio-controls audio{width:100%;height:42px;border-radius:12px}
+    .player-meta{display:flex;justify-content:space-between;color:#245b6f;font-weight:600;font-size:0.9rem;padding:0.4rem 0.8rem;border-radius:999px;background:white;box-shadow:inset 0 -1px 0 rgba(0,0,0,0.02)}
+
+    .video-teaser{background:linear-gradient(180deg,#15394a,#0f2340);color:#f6fbff;padding:1rem;border-radius:14px;margin-bottom:1.4rem}
+    .video-placeholder{border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);margin-bottom:0.6rem}
+    .video-meta{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,0.9)}
+    .video-meta button{background:#ff7a59;border:none;color:white;padding:0.3rem 0.9rem;border-radius:999px;font-weight:700}
+
+    .podcast-episodes{background:var(--soft);border-radius:12px;padding:1rem;border:1px solid rgba(16,33,49,0.03)}
+    .podcast-episodes h4{color:#133b4d;margin-bottom:0.6rem}
+    .episode-item{display:flex;align-items:center;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid rgba(16,33,49,0.03)}
+    .episode-item button{background:#fff;border:1px solid rgba(16,33,49,0.06);border-radius:50%;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center}
+
+    /* Blog feed */
+    .blog-feed{display:flex;flex-direction:column;gap:2rem}
+    .feed-header{background:linear-gradient(180deg,#ffffff,#fff7f2);border-radius:16px;padding:1.6rem;border:1px solid rgba(16,33,49,0.04);box-shadow:0 6px 20px rgba(18,35,50,0.04)}
+    .feed-header h1{font-size:2.4rem;color:#102131;font-weight:800}
+    .feed-header p{color:var(--muted);margin-top:0.4rem}
+
+    .blog-post{background:var(--card);border-radius:16px;padding:1.6rem;border:1px solid rgba(16,33,49,0.04);box-shadow:0 12px 30px rgba(18,35,50,0.04)}
+    .post-meta{display:flex;align-items:center;gap:1rem;color:#2a647d;margin-bottom:0.8rem}
+    .post-meta time{background:#fff7ee;padding:0.3rem 0.8rem;border-radius:999px;font-weight:700}
+    .blog-post h2{font-size:1.6rem;color:#102131;margin-bottom:0.6rem}
+    .post-excerpt{color:#2f4856;margin-bottom:1rem}
+
+    .post-media{background:linear-gradient(180deg,#fff8f4,#f7fbff);padding:1rem;border-radius:12px;border:1px solid rgba(16,33,49,0.03);margin:1rem 0}
+    .media-row{display:flex;flex-wrap:wrap;gap:1rem}
+    .media-video video{width:100%;border-radius:12px;box-shadow:0 10px 24px rgba(16,33,49,0.06)}
+    .media-audio{background:#fff;border-radius:12px;padding:0.9rem}
+
+    .podcast-player-card{background:#fff7ef;border-radius:12px;padding:1rem;display:flex;gap:1rem;align-items:center}
+    .podcast-cover{background:#ff7a59;width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.6rem}
+
+    .post-footer{margin-top:1rem;display:flex;gap:1.4rem;color:#2a647d;font-weight:600;border-top:1px solid rgba(16,33,49,0.03);padding-top:1rem}
+
+    .grid-mini-posts{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+    .mini-media-card{background:#fff;border-radius:10px;padding:0.8rem;text-align:center}
+
+    .global-footer{margin-top:3rem;text-align:center;color:#6b7b8a;font-size:0.9rem;border-top:1px solid rgba(16,33,49,0.03);padding-top:1.6rem}
+
+    @media (max-width:1050px){.platform-grid{grid-template-columns:1fr}.media-sidebar{position:static}}
+    @media (max-width:700px){.grid-mini-posts{grid-template-columns:1fr}.feed-header h1{font-size:2rem}}
+  </style>
+</head>
+<body>
+  <!-- main grid: sidebar (media controls) + blog feed -->
+  <div class="platform-grid">
+
+    <!-- SIDEBAR: all media controls / audio + video streaming -->
+    <aside class="media-sidebar">
+      <div class="sidebar-header">
+        <h2>mediahub</h2>
+        <p>streaming · audio · video</p>
+      </div>
+
+      <!-- AUDIO PLAYER (global audio control) -->
+      <section class="audio-player-section">
+        <h3>🎧 now playing · podcast</h3>
+        <div class="audio-controls">
+          <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+            your browser does not support audio.
+          </audio>
+          <div class="player-meta">
+            <span>🔊 the weekly byte</span>
+            <span>live from studio</span>
+          </div>
+        </div>
+        <p style="margin-top:0.5rem; font-size:0.8rem; color:#2b5f86;">⚡ global audio bar · controls persistent</p>
+      </section>
+
+      <!-- VIDEO STREAMING (embedded in sidebar) -->
+      <article class="video-teaser">
+        <h3>📽️ featured stream</h3>
+        <div class="video-placeholder">
+          <video controls poster="https://via.placeholder.com/300x170/1f3a4b/ffffff?text=video+preview">
+            <source src="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4" type="video/mp4">
+            <source src="https://test-videos.co.uk/vids/bigbuckbunny/webm/vp8/1080/Big_Buck_Bunny_1080_10s_1MB.webm" type="video/webm">
+            your browser does not support video.
+          </video>
+        </div>
+        <div class="video-meta">
+          <span>🐇 big buck bunny (preview)</span>
+          <button aria-label="live">streaming</button>
+        </div>
+        <p style="color:#b0d2f0; font-size:0.8rem;">H.264 · 10s loop · embedded controls</p>
+      </article>
+
+      <!-- PODCAST EPISODES (audio list + quick controls) -->
+      <div class="podcast-episodes">
+        <h4>📻 podcast episodes</h4>
+        <div class="episode-item">
+          <button aria-label="play">▶️</button>
+          <div class="episode-info">
+            <span class="title">deep dive: css</span>
+            <div class="duration">34 min</div>
+          </div>
+          <audio src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" preload="none"></audio>
+        </div>
+        <div class="episode-item">
+          <button aria-label="play">▶️</button>
+          <div class="episode-info">
+            <span class="title">media queries</span>
+            <div class="duration">22 min</div>
+          </div>
+        </div>
+        <div class="episode-item">
+          <button aria-label="play">▶️</button>
+          <div class="episode-info">
+            <span class="title">streaming ux</span>
+            <div class="duration">41 min</div>
+          </div>
+        </div>
+        <p style="font-size:0.75rem; margin-top:0.8rem;">click ▶️ uses browser audio (inline)</p>
+      </div>
+    </aside>
+
+    <!-- MAIN BLOG FEED (content-driven posts with media) -->
+    <main class="blog-feed">
+
+      <!-- feed header -->
+      <header class="feed-header">
+        <h1>the media blog</h1>
+        <p>stories, podcasts & video streams — integrated with native controls</p>
+      </header>
+
+      <!-- BLOG POST 1 (video + audio inside article) -->
+      <article class="blog-post">
+        <div class="post-meta">
+          <time datetime="2025-03-21">📅 march 21, 2025</time>
+          <span class="category">📺 video feature</span>
+        </div>
+        <h2><a href="#">cinematic storytelling in the browser</a></h2>
+        <p class="post-excerpt">Embedding video clips directly into blog posts improves retention. This demo includes an H.264 stream and a complementary audio clip.</p>
+
+        <!-- embedded media block (video + audio) -->
+        <div class="post-media">
+          <div class="media-row">
+            <div class="media-video">
+              <video controls poster="https://via.placeholder.com/400x200/244c66/white?text=video+stream">
+                <source src="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4" type="video/mp4">
+                <source src="https://test-videos.co.uk/vids/bigbuckbunny/webm/vp8/1080/Big_Buck_Bunny_1080_10s_1MB.webm" type="video/webm">
+              </video>
+            </div>
+            <div class="media-audio">
+              <h4>🔊 ambient soundtrack</h4>
+              <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3">
+                fallback audio
+              </audio>
+              <div class="audio-metadata">
+                <span>soundhelix mix</span>
+                <span>mp3 · 192k</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p style="margin-bottom: 1rem;">The video streams directly (10‑second preview) while the audio player lets you control the volume and timeline — all native, no plugins.</p>
+        <div class="post-footer">
+          <span>💬 18 comments</span>
+          <span>↗️ share</span>
+          <span>⏱️ 4 min read</span>
+        </div>
+      </article>
+
+      <!-- BLOG POST 2 (embedded podcast / audio controls) -->
+      <article class="blog-post">
+        <div class="post-meta">
+          <time datetime="2025-03-19">🎙️ mar 19, 2025</time>
+          <span class="category">🎧 audio deep dive</span>
+        </div>
+        <h2><a href="#">the rise of in-browser podcasting</a></h2>
+        <p class="post-excerpt">Content‑driven blogs now integrate full podcast episodes. Below you can stream an interview without leaving the page.</p>
+
+        <!-- podcast player card -->
+        <div class="podcast-player-card">
+          <div class="podcast-cover">🎤</div>
+          <div style="flex:1">
+            <h4 style="color:#0b3b55;">"semantic media" – episode 4</h4>
+            <div class="podcast-track">
+              <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3">
+                your browser does not support audio.
+              </audio>
+            </div>
+          </div>
+        </div>
+        <p style="margin-top:1rem;">With streaming audio, users can pause, skip, and adjust volume. The native controls are accessible and lightweight.</p>
+        <div class="post-footer">
+          <span>💬 32 comments</span>
+          <span>↗️ share</span>
+          <span>⏱️ 6 min listen</span>
+        </div>
+      </article>
+
+      <!-- BLOG POST 3: multiple mini media items + video streaming -->
+      <article class="blog-post">
+        <div class="post-meta">
+          <time datetime="2025-03-16">📆 mar 16, 2025</time>
+          <span class="category">📺📻 mixed media</span>
+        </div>
+        <h2><a href="#">bite-sized media clips for engagement</a></h2>
+        <p class="post-excerpt">Sometimes you need multiple media snippets — here we showcase a grid with short audio previews and a small video.</p>
+
+        <!-- video row (compact) -->
+        <div style="margin:1rem 0 2rem;">
+          <video controls width="100%" style="border-radius: 28px;" poster="https://via.placeholder.com/600x200/234d66/white?text=video+stream+-+bunny">
+            <source src="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <!-- mini grid of audio players -->
+        <div class="grid-mini-posts">
+          <div class="mini-media-card">
+            <h4>intro tune</h4>
+            <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"></audio>
+          </div>
+          <div class="mini-media-card">
+            <h4>voice clip</h4>
+            <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"></audio>
+          </div>
+          <div class="mini-media-card">
+            <h4>sound effect</h4>
+            <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"></audio>
+          </div>
+          <div class="mini-media-card">
+            <h4>commentary</h4>
+            <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"></audio>
+          </div>
+        </div>
+        <div class="post-footer" style="margin-top:2rem;">
+          <span>💬 9 comments</span>
+          <span>↗️ share</span>
+          <span>⏱️ 3 min read + media</span>
+        </div>
+      </article>
+
+      <!-- extra semantic element: footer inside main is okay -->
+      <footer style="text-align:right; color:#4f7fa3; padding:1rem 0;">
+        <span>📌 end of blog feed · 3 posts with native media controls</span>
+      </footer>
+    </main>
+  </div> <!-- end platform-grid -->
+
+  <!-- global footer -->
+  <footer class="global-footer">
+    <p>🎬 content‑driven blog platform · media playback, video streaming & audio controls · all using semantic html and native elements. videos stream from test‑videos.co.uk / soundhelix.com (demo clips).</p>
+  </footer>
+</body>
+</html>

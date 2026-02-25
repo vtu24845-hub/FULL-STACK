@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tantraz — Responsive & Fluid Registration</title>
+  <style>
+    /* New visual: bright modular layout with responsive preview panel */
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#f7fbff;--card:#ffffff;--muted:#5b6b7a;--accent:#6366f1;--success:#10b981;--danger:#ef4444
+    }
+    html,body{height:100%}
+    body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:var(--bg);color:#06202a;display:flex;align-items:center;justify-content:center;padding:2rem}
+
+    .container{width:min(1200px,96%);display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:start}
+    @media(max-width:980px){.container{grid-template-columns:1fr}}
+
+    .panel{background:var(--card);border-radius:12px;padding:1.25rem;border:1px solid rgba(3,7,18,0.04);box-shadow:0 10px 24px rgba(3,7,18,0.06)}
+
+    header h1{font-size:1.4rem;margin-bottom:0.25rem}
+    header p{color:var(--muted);font-size:0.95rem}
+
+    form{display:grid;grid-template-columns:1fr;gap:0.85rem}
+    .row{display:flex;gap:0.8rem}
+    .col{flex:1}
+    label{display:block;font-weight:700;color:#0b2b36;margin-bottom:0.35rem}
+    input,select,textarea{width:100%;padding:0.7rem 0.85rem;border:1px solid rgba(3,7,18,0.06);border-radius:8px;background:#fbffff}
+    textarea{min-height:100px}
+
+    .controls{display:flex;gap:0.6rem;align-items:center;margin-top:0.6rem}
+    .btn{padding:0.6rem 0.9rem;border-radius:999px;border:none;background:var(--accent);color:white;font-weight:800;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(3,7,18,0.06);color:var(--muted)}
+
+    .meta{font-size:0.9rem;color:var(--muted);margin-top:0.6rem}
+
+    /* preview panel */
+    .preview{display:flex;flex-direction:column;gap:0.6rem;padding:1rem}
+    .preview .title{font-weight:800;color:#0b2540}
+    .badge{display:inline-block;padding:0.25rem 0.6rem;border-radius:999px;background:rgba(99,102,241,0.1);color:var(--accent);font-weight:700}
+
+    .info{font-size:0.92rem;color:#163240}
+    .muted{color:var(--muted);font-size:0.88rem}
+
+    .char{font-weight:700;color:#0b2540}
+
+    /* validation states */
+    .invalid{border-color:var(--danger)}
+    .message{padding:0.5rem;border-radius:8px}
+    .message.error{background:rgba(239,68,68,0.08);color:var(--danger)}
+    .message.ok{background:rgba(16,185,129,0.08);color:var(--success)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <main class="panel">
+      <header>
+        <h1>Tantraz — Fluid Registration</h1>
+        <p>Responsive form using grid & flex; preview updates live.</p>
+      </header>
+
+      <form id="reg" novalidate>
+        <div class="row">
+          <div class="col">
+            <label for="name">Full name *</label>
+            <input id="name" name="fullname" type="text" placeholder="Jordan Lee" required minlength="2" />
+          </div>
+          <div class="col">
+            <label for="email">Email *</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required />
+          </div>
+        </div>
+
+        <div>
+          <label for="category">Participation category *</label>
+          <select id="category" required>
+            <option value="">— choose —</option>
+            <option value="individual">Individual</option>
+            <option value="team">Team</option>
+            <option value="audience">Audience</option>
+            <option value="volunteer">Volunteer</option>
+          </select>
+        </div>
+
+        <div>
+          <label>T‑shirt size *</label>
+          <div class="row">
+            <label><input type="radio" name="size" value="S" required> S</label>
+            <label><input type="radio" name="size" value="M"> M</label>
+            <label><input type="radio" name="size" value="L"> L</label>
+            <label><input type="radio" name="size" value="XL"> XL</label>
+          </div>
+        </div>
+
+        <div>
+          <label>Interests (optional)</label>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+            <label><input type="checkbox" value="AI"> AI</label>
+            <label><input type="checkbox" value="webdev"> WebDev</label>
+            <label><input type="checkbox" value="cloud"> Cloud</label>
+            <label><input type="checkbox" value="devops"> DevOps</label>
+          </div>
+        </div>
+
+        <div>
+          <label for="notes">Notes (max 200)</label>
+          <textarea id="notes" maxlength="200" placeholder="Short note (optional)"></textarea>
+          <div class="meta">Characters: <span id="count" class="char">0</span>/200</div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" type="submit">Register</button>
+          <button type="button" class="btn ghost" id="reset">Reset</button>
+        </div>
+      </form>
+    </main>
+
+    <aside class="panel preview" aria-live="polite">
+      <div class="title">Live Preview</div>
+      <div class="muted">Filled fields display here as you type (demo).</div>
+      <div style="margin-top:0.6rem"><span class="badge">Responsive</span></div>
+
+      <div style="margin-top:0.8rem">
+        <div class="info"><strong>Name:</strong> <span id="pvName">—</span></div>
+        <div class="info"><strong>Email:</strong> <span id="pvEmail">—</span></div>
+        <div class="info"><strong>Category:</strong> <span id="pvCat">—</span></div>
+        <div class="info"><strong>Size:</strong> <span id="pvSize">—</span></div>
+        <div class="info"><strong>Notes:</strong> <span id="pvNotes">—</span></div>
+      </div>
+
+      <div id="pvMsg" style="margin-top:0.8rem"></div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('reg');
+      const name = document.getElementById('name');
+      const email = document.getElementById('email');
+      const category = document.getElementById('category');
+      const notes = document.getElementById('notes');
+      const count = document.getElementById('count');
+
+      const pvName = document.getElementById('pvName');
+      const pvEmail = document.getElementById('pvEmail');
+      const pvCat = document.getElementById('pvCat');
+      const pvSize = document.getElementById('pvSize');
+      const pvNotes = document.getElementById('pvNotes');
+      const pvMsg = document.getElementById('pvMsg');
+
+      function updatePreview(){
+        pvName.textContent = name.value || '—';
+        pvEmail.textContent = email.value || '—';
+        pvCat.textContent = category.value || '—';
+        const size = document.querySelector('input[name="size"]:checked');
+        pvSize.textContent = size ? size.value : '—';
+        pvNotes.textContent = notes.value || '—';
+        count.textContent = notes.value.length;
+      }
+
+      [name,email,category,notes].forEach(el => el.addEventListener('input', updatePreview));
+      document.querySelectorAll('input[name="size"]').forEach(i=>i.addEventListener('change',updatePreview));
+
+      document.getElementById('reset').addEventListener('click', ()=>{
+        form.reset(); updatePreview(); pvMsg.innerHTML='<div class="message">Form reset.</div>';
+      });
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        // simple validation summary
+        if(!name.value.trim() || !email.value.trim() || !category.value || !document.querySelector('input[name="size"]:checked')){
+          pvMsg.innerHTML = '<div class="message error">Please complete required fields: name, email, category, size.</div>';
+          return;
+        }
+        pvMsg.innerHTML = '<div class="message ok">Registration received (demo).</div>';
+      });
+
+      // initial preview
+      updatePreview();
+    })();
+  </script>
+</body>
+</html>

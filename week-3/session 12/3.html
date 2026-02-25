@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tantraz — Validation playground</title>
+  <style>
+    /* New visual: compact validation demo with live feedback */
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fcfeff;--card:#ffffff;--accent:#3b82f6;--danger:#ef4444;--muted:#4b6b82}
+    html,body{height:100%}
+    body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:var(--bg);color:#07202a;display:flex;align-items:center;justify-content:center;padding:2rem}
+
+    .panel{width:100%;max-width:820px;background:var(--card);border-radius:12px;padding:1.25rem 1.6rem;border:1px solid rgba(3,7,18,0.04);box-shadow:0 12px 36px rgba(3,7,18,0.06)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    h1{font-size:1.2rem;margin:0}
+    .lead{color:var(--muted);font-size:0.92rem}
+
+    .grid{display:grid;grid-template-columns:1fr 280px;gap:1rem;margin-top:1rem}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+    form{display:flex;flex-direction:column;gap:0.8rem}
+    label{font-weight:700;color:#07202a}
+    input,select,textarea{padding:0.7rem 0.9rem;border-radius:8px;border:1px solid rgba(3,7,18,0.06)}
+    textarea{min-height:100px}
+
+    .preview{background:#fbfeff;border-radius:8px;padding:0.9rem;border:1px solid rgba(3,7,18,0.03)}
+    .muted{color:var(--muted);font-size:0.88rem}
+
+    .row{display:flex;gap:0.6rem}
+    .btn{padding:0.6rem 0.9rem;border-radius:8px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+    .btn.secondary{background:#eef2ff;color:#1e293b}
+
+    .hint{font-size:0.85rem;color:var(--muted)}
+    .invalid{border-color:var(--danger)}
+    .err{color:var(--danger);font-size:0.85rem}
+    .count{font-weight:700;color:#0f1724}
+  </style>
+</head>
+<body>
+  <section class="panel">
+    <header>
+      <div>
+        <h1>Tantraz — Validation Playground</h1>
+        <div class="lead">Try the fields: required, maxlength, placeholders and see live feedback.</div>
+      </div>
+      <div class="muted">Demo • no network</div>
+    </header>
+
+    <div class="grid">
+      <form id="demoForm" novalidate>
+        <div>
+          <label for="name">Full name *</label>
+          <input id="name" name="fullname" type="text" placeholder="Jordan Lee" required minlength="2" />
+          <div id="nameErr" class="err" style="display:none">Please enter at least 2 characters.</div>
+        </div>
+
+        <div>
+          <label for="mail">Email *</label>
+          <input id="mail" name="email" type="email" placeholder="you@example.com" required />
+          <div id="mailErr" class="err" style="display:none">Please provide a valid email.</div>
+        </div>
+
+        <div>
+          <label for="category">Category *</label>
+          <select id="category" required>
+            <option value="">— choose —</option>
+            <option value="individual">Individual</option>
+            <option value="team">Team</option>
+            <option value="audience">Audience</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="message">Notes (max 140)</label>
+          <textarea id="message" maxlength="140" placeholder="Short note (optional)"></textarea>
+          <div class="row" style="align-items:center;justify-content:space-between;margin-top:6px">
+            <div class="hint">Use helpful placeholders and meaningful labels.</div>
+            <div class="hint">Chars: <span id="cc" class="count">0</span>/140</div>
+          </div>
+        </div>
+
+        <div style="margin-top:6px;display:flex;gap:0.6rem;align-items:center">
+          <button class="btn" type="submit">Submit</button>
+          <button class="btn secondary" type="button" id="resetBtn">Reset</button>
+        </div>
+      </form>
+
+      <aside class="preview" aria-live="polite">
+        <strong>Live preview</strong>
+        <div style="margin-top:0.6rem" id="pv">No submission yet. Fill fields and submit to see validated summary.</div>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    (function(){
+      const form = document.getElementById('demoForm');
+      const name = document.getElementById('name');
+      const mail = document.getElementById('mail');
+      const category = document.getElementById('category');
+      const msg = document.getElementById('message');
+      const cc = document.getElementById('cc');
+      const pv = document.getElementById('pv');
+      const nameErr = document.getElementById('nameErr');
+      const mailErr = document.getElementById('mailErr');
+
+      // char count
+      msg.addEventListener('input', ()=>{ cc.textContent = msg.value.length; });
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        let valid = true;
+        // name
+        if(name.value.trim().length < 2){ name.classList.add('invalid'); nameErr.style.display='block'; valid=false; } else { name.classList.remove('invalid'); nameErr.style.display='none'; }
+        // email (simple pattern)
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail.value)){ mail.classList.add('invalid'); mailErr.style.display='block'; valid=false; } else { mail.classList.remove('invalid'); mailErr.style.display='none'; }
+        // category
+        if(!category.value){ category.classList.add('invalid'); valid=false; } else category.classList.remove('invalid');
+
+        if(valid){
+          pv.innerHTML = `<div style="color:green;font-weight:700">Submitted (demo)</div><div><strong>Name:</strong> ${name.value || '(empty)'}</div><div><strong>Email:</strong> ${mail.value}</div><div><strong>Category:</strong> ${category.value}</div><div><strong>Notes:</strong> ${msg.value || '–'}</div>`;
+        } else {
+          pv.innerHTML = '<div style="color:var(--danger)">Form has errors — fix highlighted fields.</div>';
+        }
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', ()=>{ form.reset(); cc.textContent='0'; pv.textContent='Form reset.'; name.classList.remove('invalid'); mail.classList.remove('invalid'); });
+    })();
+  </script>
+</body>
+</html>

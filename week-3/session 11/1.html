@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* Minimal modern dark-glass redesign — structure preserved */
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0b1220;
+      --panel:rgba(255,255,255,0.04);
+      --muted:rgba(255,255,255,0.6);
+      --accent:#7dd3fc;
+      --glass-border:rgba(255,255,255,0.06);
+      --card:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+    html,body{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(125,211,252,0.06), transparent), var(--bg);
+      color: #e6eef6;
+      -webkit-font-smoothing:antialiased;
+      line-height:1.5;
+      padding:2rem 1.5rem;
+      display:flex;flex-direction:column;min-height:100vh
+    }
+    .app-layout{display:grid;grid-template-columns:280px 1fr;gap:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1}
+
+    /* Sidebar — glass card with vivid accent */
+    .fixed-sidebar{position:sticky;top:2rem;align-self:start;padding:2rem;border-radius:18px;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--glass-border);box-shadow:0 10px 30px rgba(3,7,18,0.6)}
+    .fixed-sidebar header{margin-bottom:1.6rem}
+    .fixed-sidebar h2{font-size:1.6rem;font-weight:700;color:var(--accent);letter-spacing:-0.01em}
+    .fixed-sidebar p{color:var(--muted);margin-top:0.25rem;font-size:0.95rem}
+    .sidebar-nav{display:flex;flex-direction:column;gap:0.6rem;margin-top:1rem}
+    .sidebar-nav a{display:block;padding:0.75rem 1rem;border-radius:12px;color:#cfeffd;text-decoration:none;font-weight:600;background:transparent;border:1px solid transparent;transition:all .18s}
+    .sidebar-nav a:hover{transform:translateX(6px);background:rgba(125,211,252,0.06);border-color:rgba(125,211,252,0.08)}
+    .fixed-sidebar footer{margin-top:1.8rem;color:#9fb9cc;font-size:0.86rem;border-top:1px dashed rgba(255,255,255,0.03);padding-top:1rem}
+
+    /* Main content */
+    .main-content{display:flex;flex-direction:column;gap:2rem}
+    .content-header{padding:1.6rem 2rem;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid var(--glass-border);backdrop-filter:blur(6px)}
+    .content-header h1{font-size:2rem;color:#dff8ff;font-weight:700}
+    .content-header p{color:var(--muted);margin-top:0.4rem}
+
+    /* Grid sections — sleek cards */
+    .grid-section{padding:1.6rem;border-radius:14px;background:var(--card);border:1px solid var(--glass-border)}
+    .grid-section header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap}
+    .grid-section h3{font-size:1.25rem;color:#d7f6ff;margin:0;font-weight:700}
+    .badge{background:rgba(125,211,252,0.08);color:var(--accent);padding:0.25rem 0.8rem;border-radius:999px;font-weight:600}
+
+    .grid-container{display:grid;gap:1.25rem}
+    .grid-config-a{grid-template-columns:repeat(3,1fr)}
+    .grid-card{Padding:1.2rem;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;min-height:140px;transition:transform .18s,box-shadow .18s}
+    .grid-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,8,20,0.6);border-color:rgba(125,211,252,0.08)}
+    .grid-card h4{font-size:1.15rem;color:#eaffff;margin-bottom:0.5rem}
+    .grid-card p{color:rgba(230,238,246,0.8);flex:1}
+    .grid-card footer{color:#9fc7da;font-size:0.9rem;border-top:1px solid rgba(255,255,255,0.02);padding-top:0.8rem;margin-top:1rem;display:flex;justify-content:space-between}
+
+    .grid-config-b{grid-template-columns:2fr 1fr;margin-top:1.6rem}
+    .grid-config-c{grid-template-columns:repeat(4,1fr);gap:0.8rem;margin-top:1.2rem}
+
+    .article-feed{padding:1.6rem;border-radius:14px;background:var(--card);border:1px solid var(--glass-border)}
+    .article-feed header{margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem}
+    .article-feed h3{font-size:1.2rem;color:#dff8ff}
+    .feed-item{display:flex;align-items:center;gap:1rem;padding:0.9rem 0;border-bottom:1px solid rgba(255,255,255,0.02)}
+    .feed-item time{min-width:64px;font-weight:700;color:var(--accent)}
+    .feed-item p{color:rgba(230,238,246,0.9)}
+
+    .page-footer{margin-top:2rem;text-align:center;color:#9fb9cc;font-size:0.9rem;padding:1rem;border-top:1px solid rgba(255,255,255,0.02)}
+
+    /* Responsive */
+    @media (max-width:900px){
+      .app-layout{grid-template-columns:1fr;gap:1rem}
+      .fixed-sidebar{position:static;width:100%}
+      .grid-config-a{grid-template-columns:repeat(2,1fr)}
+      .grid-config-c{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:600px){
+      .grid-config-a,.grid-config-b,.grid-config-c{grid-template-columns:1fr}
+      .content-header h1{font-size:1.5rem}
+      body{padding:1rem}
+    }
+  </style>
+    }
+  </style>
+</head>
+<body>
+  <!-- overall page uses grid with fixed sidebar semantic template -->
+  <div class="app-layout">
+
+    <!-- fixed sidebar (semantic <aside>) -->
+    <aside class="fixed-sidebar">
+      <header>
+        <h2>📌 library</h2>
+        <p style="color:#34658b; margin-top: 0.3rem;">fixed sidebar</p>
+      </header>
+
+      <nav class="sidebar-nav" aria-label="primary sidebar">
+        <a href="#">📊 dashboard</a>
+        <a href="#">📁 projects</a>
+        <a href="#">🧩 components</a>
+        <a href="#">📈 analytics</a>
+        <a href="#">⚙️ settings</a>
+        <a href="#">📨 messages</a>
+      </nav>
+
+      <footer>
+        <p>🎯 sticky sidebar<br>• stays fixed on scroll<br>• semantic aside + nav</p>
+        <p style="margin-top:1rem; font-size:0.8rem;">v2.3.1 · layout kit</p>
+      </footer>
+    </aside>
+
+    <!-- main content column (semantic <main>) -->
+    <main class="main-content">
+
+      <!-- page header -->
+      <header class="content-header">
+        <h1>multi‑config layouts</h1>
+        <p>grid‑based blocks + fixed sidebar template — all semantic tags</p>
+      </header>
+
+      <!-- GRID CONFIGURATION A : 3-column grid section -->
+      <section class="grid-section">
+        <header>
+          <h3>📐 grid A · triple column</h3>
+          <span class="badge">3fr / 1fr / 1fr</span>
+        </header>
+        <div class="grid-container grid-config-a">
+          <article class="grid-card">
+            <h4>explore</h4>
+            <p>Semantic grid with three cards, each using article and header/footer.</p>
+            <footer><span>🔷 alpha</span> <span>v1</span></footer>
+          </article>
+          <article class="grid-card">
+            <h4>compose</h4>
+            <p>Perfect for dashboards or collections. Fully responsive.</p>
+            <footer><span>🔶 beta</span> <span>v2</span></footer>
+          </article>
+          <article class="grid-card">
+            <h4>analyze</h4>
+            <p>Includes nested footer, time stamps, and consistent padding.</p>
+            <footer><span>🟢 stable</span> <span>v3</span></footer>
+          </article>
+        </div>
+      </section>
+
+      <!-- GRID CONFIGURATION B : asymmetric 2fr + 1fr -->
+      <section class="grid-section">
+        <header>
+          <h3>⚖️ grid B · asymmetric (2fr + 1fr)</h3>
+          <span class="badge">featured + sidebar</span>
+        </header>
+        <div class="grid-container grid-config-b">
+          <article class="grid-card">
+            <h4>spotlight</h4>
+            <p>Wider column (2fr) — great for main content, summaries, or calls‑to‑action. All inside semantic article.</p>
+            <footer>🟠 2,4k views</footer>
+          </article>
+          <article class="grid-card">
+            <h4>meta</h4>
+            <p>Narrow column for metadata, tags, or quick links.</p>
+            <footer>⚡ updated</footer>
+          </article>
+        </div>
+      </section>
+
+      <!-- GRID CONFIGURATION C : 4-column micro grid -->
+      <section class="grid-section">
+        <header>
+          <h3>🧩 grid C · four columns</h3>
+          <span class="badge">compact tools</span>
+        </header>
+        <div class="grid-container grid-config-c">
+          <article class="grid-card">
+            <h4>tool</h4>
+            <p>icon</p>
+            <footer>⌘1</footer>
+          </article>
+          <article class="grid-card">
+            <h4>style</h4>
+            <p>css</p>
+            <footer>⌘2</footer>
+          </article>
+          <article class="grid-card">
+            <h4>code</h4>
+            <p>html</p>
+            <footer>⌘3</footer>
+          </article>
+          <article class="grid-card">
+            <h4>test</h4>
+            <p>jest</p>
+            <footer>⌘4</footer>
+          </article>
+        </div>
+      </section>
+
+      <!-- extra semantic region: article feed (showcasing time, header) -->
+      <article class="article-feed">
+        <header>
+          <h3>📰 recent articles</h3>
+          <span class="badge">feed</span>
+        </header>
+        <div class="feed-item">
+          <time datetime="2025-03-20">20 mar</time>
+          <p><strong>grid deep-dive</strong> · css subgrid and templates</p>
+        </div>
+        <div class="feed-item">
+          <time datetime="2025-03-18">18 mar</time>
+          <p><strong>fixed sidebar patterns</strong> · sticky + semantic html</p>
+        </div>
+        <div class="feed-item">
+          <time datetime="2025-03-15">15 mar</time>
+          <p><strong>semantic ui</strong> · header, main, footer, section, article</p>
+        </div>
+        <footer style="margin-top: 1.2rem; color:#456f94;">📌 3 entries · end of feed</footer>
+      </article>
+    </main>
+  </div> <!-- end app-layout -->
+
+  <!-- global page footer (semantic) -->
+  <footer class="page-footer">
+    <p>🧱 semantic layout experiment — grid‑based + fixed sidebar template. all tags: <code>header, footer, main, aside, section, article, nav, time</code>.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PizzaFlow — Promises & async demo</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial;background:#fff8f2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;color:#2b2b2b}
+    .layout{width:min(900px,96%);display:grid;grid-template-columns:1fr 340px;gap:1rem}
+    @media(max-width:940px){.layout{grid-template-columns:1fr}}
+    .card{background:#fff;border-radius:12px;padding:1rem;border:1px solid rgba(0,0,0,0.04);box-shadow:0 8px 24px rgba(0,0,0,0.05)}
+    h1{font-size:1.3rem;margin-bottom:0.2rem}
+    .sub{color:#556b6f;margin-bottom:0.8rem}
+    .menu{display:flex;flex-wrap:wrap;gap:0.6rem}
+    .item{background:#ffdca8;padding:0.5rem 0.9rem;border-radius:10px;font-weight:800}
+    .item.selected{background:#ffb4a2}
+    .btn{background:#ef476f;color:white;padding:0.6rem 0.9rem;border-radius:8px;border:0;cursor:pointer;font-weight:800}
+    .log{background:#0b1620;color:#bfe7ff;padding:0.8rem;border-radius:8px;height:180px;overflow:auto;font-family:monospace}
+    .step{margin:0.3rem 0;padding-left:0.6rem;border-left:3px solid rgba(0,0,0,0.08)}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <main class="card">
+      <h1>PizzaFlow — order simulation</h1>
+      <p class="sub">Uses Promises (then/catch) and async/await example</p>
+
+      <div class="menu" id="menu">
+        <div class="item selected" data-name="Margherita">Margherita</div>
+        <div class="item" data-name="Pepperoni">Pepperoni</div>
+        <div class="item" data-name="Veggie">Veggie</div>
+        <div class="item" data-name="Hawaiian">Hawaiian</div>
+      </div>
+
+      <div style="margin-top:0.8rem;display:flex;gap:0.6rem">
+        <button id="order" class="btn">Order (Promise)</button>
+        <button id="orderAsync" class="btn" style="background:#118ab2">Order (async/await)</button>
+      </div>
+    </main>
+
+    <aside class="card">
+      <h1>Status</h1>
+      <p class="sub">Promise lifecycle log</p>
+      <div class="log" id="log"></div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      const menu = Array.from(document.querySelectorAll('.item'));
+      const logEl = document.getElementById('log');
+      let selected = 'Margherita';
+      menu.forEach(i=>i.addEventListener('click',()=>{menu.forEach(x=>x.classList.remove('selected'));i.classList.add('selected');selected=i.dataset.name;}));
+
+      function append(msg){const d=document.createElement('div');d.className='step';d.textContent=`${new Date().toLocaleTimeString()} · ${msg}`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight}
+
+      function simulateOrder(name){
+        return new Promise((resolve,reject)=>{
+          append(`Order placed for ${name}`);
+          setTimeout(()=>append('Preparing dough...'),300);
+          setTimeout(()=>append('Adding toppings...'),800);
+          setTimeout(()=>{
+            // random outcome
+            if(Math.random()<0.18) return reject(new Error('Oven failure'));
+            resolve(`${name} ready`);
+          },1500);
+        });
+      }
+
+      document.getElementById('order').addEventListener('click', ()=>{
+        simulateOrder(selected)
+          .then(msg=>{append(`✅ ${msg}`)})
+          .catch(err=>{append(`❌ ${err.message}`)});
+      });
+
+      document.getElementById('orderAsync').addEventListener('click', async ()=>{
+        try{
+          const result = await simulateOrder(selected);
+          append(`async/await → ✅ ${result}`);
+        }catch(e){
+          append(`async/await → ❌ ${e.message}`);
+        }
+      });
+
+      // initial hint
+      append('Ready — pick a pizza and order.');
+    })();
+  </script>
+</body>
+</html>

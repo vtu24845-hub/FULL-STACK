@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Motion — keyboard control + boundaries</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial;background:#f5f9ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+    .stage{width:min(920px,96%);display:grid;grid-template-columns:1fr 280px;gap:1rem}
+    @media(max-width:940px){.stage{grid-template-columns:1fr}}
+    .card{background:#fff;border-radius:12px;padding:1rem;border:1px solid rgba(0,0,0,0.04);box-shadow:0 8px 24px rgba(0,0,0,0.05)}
+    h1{font-size:1.2rem;margin-bottom:0.2rem}
+    .sub{color:#556b6f;margin-bottom:0.6rem}
+
+    .arena{background:linear-gradient(180deg,#f0f7ff,#eaf3ff);border-radius:12px;border:2px solid rgba(0,50,100,0.1);height:380px;position:relative;margin-bottom:0.8rem;overflow:hidden}
+    .sprite{width:60px;height:60px;background:#0077b6;border-radius:8px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 4px 12px rgba(0,119,182,0.3);transition:background-color 0.2s}
+    .sprite.round{border-radius:50%;background:#00d4ff}
+    .hint{background:#f0f7ff;padding:0.6rem;border-radius:8px;font-size:0.95rem;color:#0b3d66;margin-bottom:0.6rem}
+    .key{display:inline-block;background:#0077b6;color:white;padding:0.2rem 0.5rem;border-radius:4px;font-family:monospace;font-weight:700}
+
+    .sidebar{display:flex;flex-direction:column;gap:0.6rem}
+    .stat{background:#f0f7ff;padding:0.6rem;border-radius:8px;font-family:monospace}
+    .label{font-weight:700;color:#0b3d66;font-size:0.85rem}
+    .value{font-size:1.2rem;color:#0077b6}
+    button{background:#0077b6;color:white;border:0;padding:0.5rem 0.8rem;border-radius:8px;cursor:pointer;font-weight:800;margin-top:0.4rem}
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <main class="card">
+      <h1>Motion Control</h1>
+      <p class="sub">Keyboard moves shape; boundaries enforce containment</p>
+
+      <div class="arena" id="arena">
+        <div class="sprite" id="sprite"></div>
+      </div>
+
+      <div class="hint">
+        Use arrow keys or <span class="key">wasd</span> to move • shape stays in bounds
+      </div>
+      <button id="toggle">Toggle Round</button>
+    </main>
+
+    <aside class="card">
+      <h1>Position</h1>
+      <div class="stat">
+        <div class="label">X</div>
+        <div class="value" id="px">50%</div>
+      </div>
+      <div class="stat">
+        <div class="label">Y</div>
+        <div class="value" id="py">50%</div>
+      </div>
+      <div class="stat">
+        <div class="label">Pixels</div>
+        <div class="value" id="px-num">0, 0</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      const sprite = document.getElementById('sprite');
+      const arena = document.getElementById('arena');
+      const pxLabel = document.getElementById('px');
+      const pyLabel = document.getElementById('py');
+      const pxNum = document.getElementById('px-num');
+      const toggle = document.getElementById('toggle');
+
+      let x = 0, y = 0; // relative coords (-arena width/2 to +width/2, etc)
+      const step = 15;
+      const spriteW = 60, spriteH = 60;
+
+      const update = () => {
+        let areaRect = arena.getBoundingClientRect();
+        let areaW = areaRect.width, areaH = areaRect.height;
+        let actualX = (areaW / 2) + x;
+        let actualY = (areaH / 2) + y;
+
+        // boundary clamp
+        actualX = Math.max(0, Math.min(actualX, areaW - spriteW));
+        actualY = Math.max(0, Math.min(actualY, areaH - spriteH));
+
+        // map back to centered coords
+        x = actualX - (areaW / 2);
+        y = actualY - (areaH / 2);
+
+        sprite.style.left = (50 + (x / (areaW/2) * 50)) + '%';
+        sprite.style.top = (50 + (y / (areaH/2) * 50)) + '%';
+
+        pxLabel.textContent = Math.round(actualX) + 'px';
+        pyLabel.textContent = Math.round(actualY) + 'px';
+        pxNum.textContent = Math.round(actualX) + ', ' + Math.round(actualY);
+      };
+
+      window.addEventListener('keydown', (e) => {
+        if(e.target.tagName==='BUTTON') return;
+        let k = e.key.toLowerCase();
+        if(k==='arrowup'||k==='w') y -= step;
+        else if(k==='arrowdown'||k==='s') y += step;
+        else if(k==='arrowleft'||k==='a') x -= step;
+        else if(k==='arrowright'||k==='d') x += step;
+        else return;
+        e.preventDefault();
+        update();
+      });
+
+      toggle.addEventListener('click', ()=>{ sprite.classList.toggle('round'); });
+      update();
+    })();
+  </script>
+</body>
+</html>

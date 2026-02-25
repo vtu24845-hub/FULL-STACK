@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>partyLab — spread & rest</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#fffaf0,#fff6ed);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;color:#2c2a2a}
+    .wrap{width:min(900px,96%);display:grid;grid-template-columns:1fr 320px;gap:1rem}
+    @media(max-width:920px){.wrap{grid-template-columns:1fr}}
+    .card{background:#fff;border-radius:12px;padding:1rem;border:1px solid rgba(0,0,0,0.04);box-shadow:0 10px 30px rgba(0,0,0,0.05)}
+    h1{font-size:1.25rem;margin-bottom:0.2rem}
+    .sub{color:#6b6b6b;margin-bottom:0.6rem}
+    .code{background:#0b2433;color:#bce3f2;padding:0.8rem;border-radius:8px;font-family:monospace;margin-bottom:0.8rem}
+    .list{display:flex;flex-wrap:wrap;gap:0.5rem}
+    .chip{background:#ffd8a8;padding:0.4rem 0.8rem;border-radius:999px;font-weight:700}
+    .chip.me{background:#ffd3b6}
+    .btn{background:#006d77;color:white;border:0;padding:0.5rem 0.8rem;border-radius:8px;cursor:pointer;font-weight:800}
+    .muted{color:#4f6369;font-size:0.95rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card">
+      <h1>partyList</h1>
+      <p class="sub">Merge arrays with spread — capture extra args with rest</p>
+      <div class="code">const partyList = ['Me', ...college, ...work]</div>
+
+      <div style="margin-bottom:0.6rem"><strong>collegeFriends</strong></div>
+      <div class="list" id="college"></div>
+      <div style="margin-top:0.8rem"><strong>workFriends</strong></div>
+      <div class="list" id="work"></div>
+
+      <div style="margin-top:0.8rem"><strong>partyList</strong></div>
+      <div class="list" id="party"></div>
+
+      <div style="margin-top:0.9rem;display:flex;gap:0.6rem">
+        <button id="merge" class="btn">Merge (spread)</button>
+        <button id="shuffle" class="btn" style="background:#83c5be">Shuffle</button>
+      </div>
+      <div style="margin-top:0.6rem" class="muted">Spread creates a new array — originals remain unchanged.</div>
+    </main>
+
+    <aside class="card">
+      <h1>describeParty (rest)</h1>
+      <p class="sub">Call with host + many guests</p>
+      <div id="callOut" style="background:#f3f9ff;padding:0.6rem;border-radius:8px;font-family:monospace">No call yet</div>
+      <div style="margin-top:0.8rem">
+        <button id="call" class="btn">Call describeParty</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      const collegeFriends = ['Sam','Jordon','Taylor'];
+      const workFriends = ['Casey','Morgan','Riley'];
+
+      const el = id => document.getElementById(id);
+      const render = (id, arr) => { const c = el(id); c.innerHTML = ''; arr.forEach(n=>{const s=document.createElement('span');s.className='chip'+(n==='Me'?' me':'');s.textContent=n;c.appendChild(s)}); };
+
+      render('college', collegeFriends);
+      render('work', workFriends);
+
+      document.getElementById('merge').addEventListener('click', ()=>{
+        const partyList = ['Me', ...collegeFriends, ...workFriends];
+        render('party', partyList);
+      });
+
+      document.getElementById('shuffle').addEventListener('click', ()=>{
+        // simple shuffle of party
+        const partyList = ['Me', ...collegeFriends, ...workFriends];
+        for(let i=partyList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[partyList[i],partyList[j]]=[partyList[j],partyList[i]]}
+        render('party', partyList);
+      });
+
+      function describeParty(host, ...guests){
+        if(guests.length===0) return `${host} is solo`;
+        return `${host} invites: ${guests.join(', ')}`;
+      }
+
+      document.getElementById('call').addEventListener('click', ()=>{
+        const msg = describeParty('Alex', ...collegeFriends.slice(0,2));
+        el('callOut').textContent = msg;
+      });
+    })();
+  </script>
+</body>
+</html>
